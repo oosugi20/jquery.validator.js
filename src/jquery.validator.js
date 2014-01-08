@@ -123,6 +123,9 @@ Module = function (element, options) {
 			case 'alphabet-and-number':
 				this.validates.type = $.proxy(this.isAlphabetAndNumber, this);
 				break;
+			case 'fullwidthchar':
+				this.validates.type = $.proxy(this.isFullWidthChar, this);
+				break;
 		}
 	};
 
@@ -192,6 +195,13 @@ Module = function (element, options) {
 	 */
 	fn.isAlphabetAndNumber = function () {
 		return (this.isAlphabetOrNumber() && this.hasAlphabet() && this.hasNumber());
+	};
+
+	/**
+	 * isFullWidthChar
+	 */
+	fn.isFullWidthChar = function () {
+		return /^[^ -~｡-ﾟ\t　]+$/.test(this.$input.val());
 	};
 
 	/**
