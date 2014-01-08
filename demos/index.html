@@ -8,6 +8,9 @@
 <style>
 [data-validator] {
 }
+[data-validator-errormsg] {
+	display: none;
+}
 </style>
 <script>
 $(function () {
@@ -17,6 +20,117 @@ $(function () {
 </head>
 
 <body>
-<div data-validator></div>
+<h2>types</h2>
+<pre>
+data-validator-type="alphabet"
+data-validator-type="number"
+data-validator-type="alphabet-or-number"
+data-validator-type="alphabet-and-number"
+</pre>
+
+
+<hr />
+
+<h2>Samples</h2>
+
+<pre>
+ data-validator-type="alphabet-and-number"
+ data-validator-required="true"
+ data-validator-minsize="7"
+ data-validator-event="keyup"
+</pre>
+<div data-validator="unique-id">
+<input
+ type="text"
+ value=""
+ data-validator-type="alphabet-and-number"
+ data-validator-required="true"
+ data-validator-minsize="7"
+ data-validator-event="keyup"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+<hr />
+
+<pre>
+ data-validator-type="alphabet"
+</pre>
+<div data-validator="unique-id">
+<input
+ type="text"
+ value=""
+ data-validator-type="alphabet"
+ data-validator-required="true"
+ data-validator-event="keyup"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+<hr />
+
+<pre>
+ data-validator-type="number"
+</pre>
+<div data-validator="unique-id">
+<input
+ type="text"
+ value=""
+ data-validator-type="number"
+ data-validator-required="true"
+ data-validator-event="keyup"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+<hr />
+
+
+<pre>
+ data-validator-type="alphabet-or-number"
+</pre>
+<div data-validator="unique-id">
+<input
+ type="text"
+ value=""
+ data-validator-type="alphabet-or-number"
+ data-validator-required="true"
+ data-validator-event="keyup"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+<hr />
+
+
+<h3>Run initialized</h3>
+<pre>
+ data-validator-event="validator:ready"
+</pre>
+<div data-validator="unique-id">
+<input
+ type="text"
+ value=""
+ data-validator-type="alphabet-and-number"
+ data-validator-required="true"
+ data-validator-event="validator:ready"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
 </body>
 </html>
