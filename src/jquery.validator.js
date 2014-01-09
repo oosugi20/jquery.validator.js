@@ -153,6 +153,8 @@ Module = function (element, options) {
 			case 'fullwidthchar':
 				this.validates.type = $.proxy(this.isFullWidthChar, this);
 				break;
+			case 'select':
+				break;
 		}
 	};
 
