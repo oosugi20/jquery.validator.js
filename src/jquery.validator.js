@@ -21,6 +21,8 @@ Module = function (element, options) {
 	 * init
 	 */
 	fn.init = function () {
+		var _this = this;
+
 		this.$input = this.$el.find('[data-validator-input]');
 		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
@@ -36,8 +38,8 @@ Module = function (element, options) {
 		};
 
 		this.results = {
-			type: false,
-			required: false,
+			type: true,
+			required: !_this.required,
 			minsize: true
 		};
 
@@ -273,12 +275,11 @@ var Validatorgrp = function (element, options) {
 		var _this = this;
 		this.$item = this.$el.find('[data-validator]');
 		this.$result = this.$el.find('[data-validatorgrp-result]');
-		this.allInputedFlag = false;
 		this.$item.on('validator:validate', function () {
 			_this.testAllInputed();
-			if (_this.allInputedFlag) {
-				_this.test();
-			}
+		});
+		this.$el.on('validatorgrp:allinputed', function () {
+			_this.test();
 		});
 		this.$el.on('validatorgrp:ok', function () {
 			_this.$result.filter('[data-validatorgrp-result="error"]').hide();
@@ -295,9 +296,7 @@ var Validatorgrp = function (element, options) {
 	 */
 	fn.test = function () {
 		var result = true;
-		this.$item.filter(function () {
-			return $(this).find('[data-validator-input]').val();
-		}).each(function () {
+		this.$item.each(function () {
 			if (!$(this).data('validator').ok()) {
 				result = false;
 				return false;
@@ -316,6 +315,7 @@ var Validatorgrp = function (element, options) {
 	 */
 	fn.testAllInputed = function () {
 		var result = true;
+		var _this = this;
 		this.$item.each(function () {
 			var $required = $(this).find('[data-validator-required="true"]');
 			if ($required.length && !$required.val()) {
@@ -324,8 +324,10 @@ var Validatorgrp = function (element, options) {
 			}
 		});
 		if (result) {
-			this.allInputedFlag = true;
-			this.$el.trigger('validatorgrp:allinputed');
+			// validatorのevent後に発火させる
+			setTimeout(function () {
+				_this.$el.trigger('validatorgrp:allinputed');
+			}, 4);
 		}
 		return result;
 	};
@@ -343,5 +345,73 @@ $.fn.validatorgrp = function (options) {
 };
 
 $.Validatorgrp = Validatorgrp;
+
+
+var Validatorform = function (element, options) {
+	this.el = element;
+	this.$el = $(element);
+	this.options = $.extend({
+	}, options);
+};
+
+(function (fn) {
+	/**
+	 * init
+	 */
+	fn.init = function () {
+		var _this = this;
+
+		this.$submit = this.$el.find('[data-validatorform-submit]');
+		this.$submit.addClass('disabled');
+		this.$item = this.$el.find('[data-validator]');
+
+		this.$el.on('validator:validate', function () {
+			_this.test();
+		});
+
+		this.$el.on('validatorform:ok', function () {
+			_this.$submit.removeClass('disabled');
+			_this.$submit.addClass('enabled');
+		});
+
+		this.$el.on('validatorform:error', function () {
+			_this.$submit.addClass('disabled');
+			_this.$submit.removeClass('enabled');
+		});
+	};
+
+	/**
+	 * test
+	 */
+	fn.test = function () {
+		var result = true;
+		this.$item.each(function () {
+			if (!$(this).data('validator').ok()) {
+				result = false;
+				return false;
+			}
+		});
+		if (result) {
+			this.$el.trigger('validatorform:ok');
+		} else {
+			this.$el.trigger('validatorform:error');
+		}
+		return result;
+	};
+
+})(Validatorform.prototype);
+
+$.fn.validatorform = function (options) {
+	return this.each(function () {
+		var module;
+		if (!$.data(this, 'validatorform')) {
+			module = new Validatorform(this, options);
+			$.data(this, 'validatorform', module);
+			module.init();
+		}
+	});
+};
+
+$.Validatorform = Validatorform;
 
 })(jQuery, this);

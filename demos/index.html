@@ -11,11 +11,26 @@
 [data-validator-errormsg] {
 	display: none;
 }
+.submit {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+}
+.btn-enabled, .btn-disabled {
+	display: none;
+}
+.disabled .btn-disabled {
+	display: block;
+}
+.enabled .btn-enabled {
+	display: block;
+}
 </style>
 <script>
 $(function () {
 	$('[data-validator]').validator();
 	$('[data-validatorgrp]').validatorgrp();
+	$('[data-validatorform]').validatorform();
 });
 </script>
 </head>
@@ -34,6 +49,8 @@ data-validator-type="alphabet-and-number"
 
 <h2>Samples</h2>
 
+<div data-validatorform>
+
 <pre>
  data-validator-type="alphabet-and-number"
  data-validator-required="true"
@@ -41,7 +58,7 @@ data-validator-type="alphabet-and-number"
  data-validator-event="keyup"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
@@ -62,7 +79,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="alphabet"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
@@ -82,7 +99,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="number"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
@@ -103,7 +120,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="alphabet-or-number"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
@@ -126,7 +143,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="fullwidthchar"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
@@ -149,7 +166,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="select"
 </pre>
 <div data-validator="unique-id">
-<select
+required <select
  data-validator-input
  data-validator-type="select"
  data-validator-required="true"
@@ -173,7 +190,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="radio"
 </pre>
 <div data-validator="unique-id">
-<div
+required <div
  data-validator-type="radio"
  data-validator-required="true"
  data-validator-event="change validator:ready"
@@ -195,7 +212,7 @@ data-validator-type="alphabet-and-number"
  data-validator-type="checkbox"
 </pre>
 <div data-validator="unique-id">
-<div
+required <div
  data-validator-type="checkbox"
  data-validator-required="true"
  data-validator-event="change validator:ready"
@@ -216,13 +233,13 @@ data-validator-type="alphabet-and-number"
  data-validator-event="validator:ready"
 </pre>
 <div data-validator="unique-id">
-<input
+required <input
  type="text"
  value=""
  data-validator-input
  data-validator-type="alphabet-and-number"
  data-validator-required="true"
- data-validator-event="validator:ready"
+ data-validator-event="keyup validator:ready"
 /> 
  
 <div data-validator-errormsg="required">Error: requierd</div>
@@ -286,6 +303,19 @@ optional <input
 
 <div data-validatorgrp-result="ok" style="display:none">grp: ok</div>
 <div data-validatorgrp-result="error">grp: error</div>
+</div>
+
+
+<!--
+  input[type="submit"] の class の切り替えのみだと、disabledの時でも押せちゃう。
+  classの他にdisabled属性をつけると押せなくなるが、ブラウザによって表示の差異が現れるはず。
+  よって、enable状態disble状態のボタンの両方を入れておいて、親要素のclassの切り替えによって表示/非表示を切り替える。
+  -->
+<div class="submit" data-validatorform-submit>
+<input type="submit" value="submit" class="btn-enabled" />
+<div class="btn-disabled">disabled</div>
+</div>
+
 </div>
 
 </body>
