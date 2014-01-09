@@ -25,7 +25,7 @@ Module = function (element, options) {
 		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
 		this.type = this.$el.find('[data-validator-type]').attr('data-validator-type');
-		this.required = !!(this.$el.find('[data-validator-required]').attr('data-validator-required'));
+		this.required = (this.$el.find('[data-validator-required]').attr('data-validator-required') === 'true') ? true : false;
 		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
 		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
 
@@ -155,7 +155,7 @@ Module = function (element, options) {
 	 * _setRequiredValidate
 	 */
 	fn._setRequiredValidate = function () {
-		if (this.required) {
+		if (this.required === true) {
 			this.validates.required = $.proxy(this.isRequired, this);
 		}
 	};
@@ -176,7 +176,7 @@ Module = function (element, options) {
 	fn.isRequired = function () {
 		var result = !!(this.$input.val());
 
-		if (this.type === 'radio') {
+		if (this.type === 'radio' || this.type === 'checkbox') {
 			result = !!(this.$input.filter(':checked').val());
 		}
 		return result;
@@ -298,7 +298,6 @@ var Validatorgrp = function (element, options) {
 		this.$item.filter(function () {
 			return $(this).find('[data-validator-input]').val();
 		}).each(function () {
-			console.log('test', $(this).data('validator').ok());
 			if (!$(this).data('validator').ok()) {
 				result = false;
 				return false;
@@ -328,7 +327,6 @@ var Validatorgrp = function (element, options) {
 			this.allInputedFlag = true;
 			this.$el.trigger('validatorgrp:allinputed');
 		}
-		console.log('testAllInputed', result);
 		return result;
 	};
 })(Validatorgrp.prototype);
