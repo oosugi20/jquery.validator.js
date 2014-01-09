@@ -74,6 +74,18 @@ Module = function (element, options) {
 		this.$el.on('validator:ok', function (event, key) {
 			_this.hideErrorMsg(key);
 		});
+
+		// 必須項目でなければ、空白になったらokにする
+		if (!this.required) {
+			this.$el.on(this.event, function () {
+				if (!$(this).find(_this.$input).val()) {
+					$.each(_this.results, function (key, value) {
+						_this.results[key] = true;
+						_this.hideErrorMsg(key);
+					});
+				}
+			});
+		}
 	};
 
 	/**
@@ -103,6 +115,21 @@ Module = function (element, options) {
 				_this.$el.trigger('validator:ok', key);
 			}
 		});
+		this.$el.trigger('validator:validate');
+	};
+
+	/**
+	 * ok
+	 */
+	fn.ok = function () {
+		var result = true;
+		$.each(this.results, function (key, value) {
+			if (!value) {
+				result = false;
+				return false;
+			}
+		});
+		return result;
 	};
 
 
@@ -228,5 +255,95 @@ $.fn[PLUGIN_NAME] = function (options) {
 
 // set global
 $[MODULE_NAME] = Module;
+
+
+
+var Validatorgrp = function (element, options) {
+	this.el = element;
+	this.$el = $(element);
+	this.options = $.extend({
+	}, options);
+};
+
+(function (fn) {
+	/**
+	 * init
+	 */
+	fn.init = function () {
+		var _this = this;
+		this.$item = this.$el.find('[data-validator]');
+		this.$result = this.$el.find('[data-validatorgrp-result]');
+		this.allInputedFlag = false;
+		this.$item.on('validator:validate', function () {
+			_this.testAllInputed();
+			if (_this.allInputedFlag) {
+				_this.test();
+			}
+		});
+		this.$el.on('validatorgrp:ok', function () {
+			_this.$result.filter('[data-validatorgrp-result="error"]').hide();
+			_this.$result.filter('[data-validatorgrp-result="ok"]').show();
+		});
+		this.$el.on('validatorgrp:error', function () {
+			_this.$result.filter('[data-validatorgrp-result="ok"]').hide();
+			_this.$result.filter('[data-validatorgrp-result="error"]').show();
+		});
+	};
+
+	/**
+	 * test
+	 */
+	fn.test = function () {
+		var result = true;
+		this.$item.filter(function () {
+			return $(this).find('[data-validator-type]').val();
+		}).each(function () {
+			console.log('test', $(this).data('validator').ok());
+			if (!$(this).data('validator').ok()) {
+				result = false;
+				return false;
+			}
+		});
+		if (result) {
+			this.$el.trigger('validatorgrp:ok');
+		} else {
+			this.$el.trigger('validatorgrp:error');
+		}
+		return result;
+	};
+
+	/**
+	 * fn.testAllInputed
+	 */
+	fn.testAllInputed = function () {
+		var result = true;
+		this.$item.each(function () {
+			var $required = $(this).find('[data-validator-required="true"]');
+			if ($required.length && !$required.val()) {
+				result = false;
+				return false;
+			}
+		});
+		if (result) {
+			this.allInputedFlag = true;
+			this.$el.trigger('validatorgrp:allinputed');
+		}
+		console.log('testAllInputed', result);
+		return result;
+	};
+})(Validatorgrp.prototype);
+
+$.fn.validatorgrp = function (options) {
+	return this.each(function () {
+		var module;
+		if (!$.data(this, 'validatorgrp')) {
+			module = new Validatorgrp(this, options);
+			$.data(this, 'validatorgrp', module);
+			module.init();
+		}
+	});
+};
+
+$.Validatorgrp = Validatorgrp;
 
 })(jQuery, this);
