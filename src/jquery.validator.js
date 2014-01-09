@@ -21,12 +21,13 @@ Module = function (element, options) {
 	 * init
 	 */
 	fn.init = function () {
-		this._prepareElms();
+		this.$input = this.$el.find('[data-validator-input]');
+		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
-		this.type = this.$input.attr('data-validator-type');
-		this.required = !!(this.$input.attr('data-validator-required'));
-		this.minsize = this.$input.attr('data-validator-minsize');
-		this.event = this.$input.attr('data-validator-event');
+		this.type = this.$el.find('[data-validator-type]').attr('data-validator-type');
+		this.required = !!(this.$el.find('[data-validator-required]').attr('data-validator-required'));
+		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
+		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
 
 		this.validates = {
 			type: function () { return true; },
@@ -47,14 +48,6 @@ Module = function (element, options) {
 		this._eventify();
 
 		this.$el.trigger('validator:ready');
-	};
-
-	/**
-	 * _prepareElms
-	 */
-	fn._prepareElms = function () {
-		this.$input = this.$el.find('[data-validator-type]');
-		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 	};
 
 	/**
@@ -181,7 +174,12 @@ Module = function (element, options) {
 	 * isRequired
 	 */
 	fn.isRequired = function () {
-		return !!(this.$input.val());
+		var result = !!(this.$input.val());
+
+		if (this.type === 'radio') {
+			result = !!(this.$input.filter(':checked').val());
+		}
+		return result;
 	};
 
 	/**
@@ -298,7 +296,7 @@ var Validatorgrp = function (element, options) {
 	fn.test = function () {
 		var result = true;
 		this.$item.filter(function () {
-			return $(this).find('[data-validator-type]').val();
+			return $(this).find('[data-validator-input]').val();
 		}).each(function () {
 			console.log('test', $(this).data('validator').ok());
 			if (!$(this).data('validator').ok()) {
