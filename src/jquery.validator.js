@@ -24,9 +24,10 @@ Module = function (element, options) {
 		var _this = this;
 
 		this.$input = this.$el.find('[data-validator-input]');
+		this.$unit = this.$el.find('[data-validator-type]');
 		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
-		this.type = this.$el.find('[data-validator-type]').attr('data-validator-type');
+		this.type = this.$unit.attr('data-validator-type');
 
 		var required = this.$el.find('[data-validator-required]').attr('data-validator-required');
 		this.required = (required !== undefined && required !== 'false') ? true : false;
@@ -186,11 +187,19 @@ Module = function (element, options) {
 	 * isRequired
 	 */
 	fn.isRequired = function () {
-		var result = !!(this.$input.val());
+		var _this = this;
+		var result = true;
 
-		if (this.type === 'radio' || this.type === 'checkbox') {
-			result = !!(this.$input.filter(':checked').val());
-		}
+		this.$unit.each(function () {
+			var $this = $(this);
+			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
+
+			if (!$input.val()) {
+				result = false;
+				return false;
+			}
+		});
+
 		return result;
 	};
 
@@ -198,7 +207,17 @@ Module = function (element, options) {
 	 * isAlphabet
 	 */
 	fn.isAlphabet = function () {
-		return /^[a-zA-Z]+$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if (!/^[a-zA-Z]+$/.test($(this).val())) {
+				result = false;
+				return false;
+			}
+		});
+
+		return result;
 	};
 
 	/**
