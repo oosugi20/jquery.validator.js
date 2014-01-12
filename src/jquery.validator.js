@@ -27,7 +27,10 @@ Module = function (element, options) {
 		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
 		this.type = this.$el.find('[data-validator-type]').attr('data-validator-type');
-		this.required = (this.$el.find('[data-validator-required]').attr('data-validator-required') === 'true') ? true : false;
+
+		var required = this.$el.find('[data-validator-required]').attr('data-validator-required');
+		this.required = (required !== undefined && required !== 'false') ? true : false;
+
 		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
 		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
 
