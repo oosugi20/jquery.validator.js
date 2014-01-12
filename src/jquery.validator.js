@@ -159,13 +159,13 @@ Module = function (element, options) {
 			}
 		};
 
-		// 必須チェックだけ必ず先に実行する
-		_validate('required', this.validates.required);
+		// 必須チェックは必ず最後に実行する
 		$.each(this.validates, function (key, validate) {
 			if (key !== 'required') {
 				_validate(key, validate);
 			}
 		});
+		_validate('required', this.validates.required);
 		this.$el.trigger('validator:validate');
 	};
 
