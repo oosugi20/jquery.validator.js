@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
  * lastupdate: 2014-01-13
- * version: 0.1.4
+ * version: 0.1.5
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -116,6 +116,9 @@ Module = function (element, options) {
 			if ($(this).val()) {
 				$(this).data('validator-inputed', true);
 			}
+		});
+		this.$el.on('change', '[data-validator-type]', function () {
+			$(this).data('validator-inputed', true)
 		});
 
 		// 必須項目でなければ、空白になったらokにする
