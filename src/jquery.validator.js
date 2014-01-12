@@ -74,6 +74,9 @@ Module = function (element, options) {
 		});
 
 		this.$el.on('validator:error', function (event, key) {
+			if (key === 'required') {
+				_this.hideErrorMsg('all');
+			}
 			_this.showErrorMsg(key);
 		});
 
@@ -98,14 +101,22 @@ Module = function (element, options) {
 	 * showErrorMsg
 	 */
 	fn.showErrorMsg = function (key) {
-		this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').show();
+		if (key === 'all') {
+			this.$errormsg.show();
+		} else {
+			this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').show();
+		}
 	};
 
 	/**
 	 * hideErrorMsg
 	 */
 	fn.hideErrorMsg = function (key) {
-		this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').hide();
+		if (key === 'all') {
+			this.$errormsg.hide();
+		} else {
+			this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').hide();
+		}
 	};
 
 	/**
@@ -113,12 +124,20 @@ Module = function (element, options) {
 	 */
 	fn.validate = function () {
 		var _this = this;
-		$.each(this.validates, function (key, validate) {
-			_this.results[key] = validate();
+		var setTrigger = function (key) {
 			if (_this.results[key] === false) {
 				_this.$el.trigger('validator:error', key);
 			} else {
 				_this.$el.trigger('validator:ok', key);
+			}
+		};
+		$.each(this.validates, function (key, validate) {
+			_this.results[key] = validate();
+
+			if (key === 'required') {
+				setTrigger(key);
+			} else if (_this.results.required) {
+				setTrigger(key);
 			}
 		});
 		this.$el.trigger('validator:validate');
