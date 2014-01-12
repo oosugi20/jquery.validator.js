@@ -31,6 +31,9 @@ Module = function (element, options) {
 		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
 		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
 
+		var initapply = this.$el.attr('data-validator-initapply');
+		this.initapply = (initapply !== undefined && initapply !== 'false') ? true : false;
+
 		this.validates = {
 			type: function () { return true; },
 			required: function () { return true; },
@@ -48,6 +51,10 @@ Module = function (element, options) {
 		this._setMinSizeValidate();
 
 		this._eventify();
+
+		if (this.initapply) {
+			this.validate();
+		}
 
 		this.$el.trigger('validator:ready');
 	};

@@ -193,7 +193,7 @@ required <select
 required <div
  data-validator-type="radio"
  data-validator-required="true"
- data-validator-event="change validator:ready"
+ data-validator-event="change"
 >
 <label><input type="radio" name="radio" value="1" data-validator-input /> radio1</label>
 <label><input type="radio" name="radio" value="2" data-validator-input /> radio2</label>
@@ -215,7 +215,7 @@ required <div
 required <div
  data-validator-type="checkbox"
  data-validator-required="true"
- data-validator-event="change validator:ready"
+ data-validator-event="change"
 >
 <label><input type="checkbox" name="radio" value="1" data-validator-input /> checkbox1</label>
 <label><input type="checkbox" name="radio" value="2" data-validator-input /> checkbox2</label>
@@ -225,13 +225,11 @@ required <div
 <div data-validator-errormsg="required">Error: requierd</div>
 </div>
 
+
+
 <hr />
 
-
-<h3>Run initialized</h3>
-<pre>
- data-validator-event="validator:ready"
-</pre>
+<h3>姓名分かれてる時みたいに複数ある場合</h2>
 <div data-validator="unique-id">
 required <input
  type="text"
@@ -239,7 +237,39 @@ required <input
  data-validator-input
  data-validator-type="alphabet-and-number"
  data-validator-required="true"
- data-validator-event="keyup validator:ready"
+ data-validator-event="keyup"
+/>
+<input
+ type="text"
+ value=""
+ data-validator-input
+ data-validator-type="alphabet-and-number"
+ data-validator-required="true"
+ data-validator-event="keyup"
+/>
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+
+<hr />
+
+
+<h3>Apply initialized</h3>
+<pre>
+ data-validator-initapply
+外すか、値をfalseで初回呼ばない。
+</pre>
+<div data-validator="unique-id" data-validator-initapply>
+required <input
+ type="text"
+ value=""
+ data-validator-input
+ data-validator-type="alphabet-and-number"
+ data-validator-required="true"
+ data-validator-event="keyup"
 /> 
  
 <div data-validator-errormsg="required">Error: requierd</div>
