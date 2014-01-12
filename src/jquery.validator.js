@@ -58,7 +58,7 @@ Module = function (element, options) {
 	fn._eventify = function () {
 		var _this = this;
 
-		this.$el.on(this.event, function () {
+		this.$el.on(this.event, '[data-validator-input]', function () {
 			_this.validate();
 		});
 
