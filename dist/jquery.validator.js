@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
  * lastupdate: 2014-01-13
- * version: 0.1.1
+ * version: 0.1.2
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -31,12 +31,19 @@ Module = function (element, options) {
 		var _this = this;
 
 		this.$input = this.$el.find('[data-validator-input]');
+		this.$unit = this.$el.find('[data-validator-type]');
 		this.$errormsg = this.$el.find('[data-validator-errormsg]');
 
-		this.type = this.$el.find('[data-validator-type]').attr('data-validator-type');
-		this.required = (this.$el.find('[data-validator-required]').attr('data-validator-required') === 'true') ? true : false;
+		this.type = this.$unit.attr('data-validator-type');
+
+		var required = this.$el.find('[data-validator-required]').attr('data-validator-required');
+		this.required = (required !== undefined && required !== 'false') ? true : false;
+
 		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
 		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
+
+		var initapply = this.$el.attr('data-validator-initapply');
+		this.initapply = (initapply !== undefined && initapply !== 'false') ? true : false;
 
 		this.validates = {
 			type: function () { return true; },
@@ -46,7 +53,7 @@ Module = function (element, options) {
 
 		this.results = {
 			type: true,
-			required: !_this.required,
+			required: _this.requiredOk(),
 			minsize: true
 		};
 
@@ -55,6 +62,14 @@ Module = function (element, options) {
 		this._setMinSizeValidate();
 
 		this._eventify();
+
+		if (this.initapply) {
+			this.validate();
+		}
+
+		this.$unit.each(function () {
+			$(this).data('validator-inputed', false)
+		});
 
 		this.$el.trigger('validator:ready');
 	};
@@ -70,38 +85,66 @@ Module = function (element, options) {
 		});
 
 		this.$el.on('validator:error', function (event, key) {
-			_this.showErrorMsg(key);
+			if (key === 'required') {
+
+				var isInputedAll = (function () {
+					return !(_this.$unit.filter('[data-validator-required]').filter(function () {
+						return $(this).data('validator-inputed') === false;
+					}).length);
+				})();
+
+				if (isInputedAll) {
+					_this.hideErrorMsg('all');
+					_this.showErrorMsg(key);
+				}
+			} else {
+				_this.showErrorMsg(key);
+			}
 		});
 
 		this.$el.on('validator:ok', function (event, key) {
 			_this.hideErrorMsg(key);
 		});
 
+
+		// 一回でも入力されたかどうかのチェック
+		this.$el.on('keyup', '[data-validator-type]', function () {
+			if ($(this).val()) {
+				$(this).data('validator-inputed', true);
+			}
+		});
+
 		// 必須項目でなければ、空白になったらokにする
-		if (!this.required) {
-			this.$el.on(this.event, function () {
-				if (!$(this).find(_this.$input).val()) {
-					$.each(_this.results, function (key, value) {
-						_this.results[key] = true;
-						_this.hideErrorMsg(key);
-					});
-				}
-			});
-		}
+		this.$el.on(this.event, '[data-validator-type]:not([data-validator-required])', function () {
+			if (!_this.isRequired($(this)) && !$(this).val()) {
+				$.each(_this.results, function (key, value) {
+					_this.results[key] = true;
+					_this.hideErrorMsg(key);
+				});
+			}
+		});
 	};
 
 	/**
 	 * showErrorMsg
 	 */
 	fn.showErrorMsg = function (key) {
-		this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').show();
+		if (key === 'all') {
+			this.$errormsg.show();
+		} else {
+			this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').show();
+		}
 	};
 
 	/**
 	 * hideErrorMsg
 	 */
 	fn.hideErrorMsg = function (key) {
-		this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').hide();
+		if (key === 'all') {
+			this.$errormsg.hide();
+		} else {
+			this.$errormsg.filter('[data-validator-errormsg="' + key + '"]').hide();
+		}
 	};
 
 	/**
@@ -109,12 +152,28 @@ Module = function (element, options) {
 	 */
 	fn.validate = function () {
 		var _this = this;
-		$.each(this.validates, function (key, validate) {
-			_this.results[key] = validate();
+		var setTrigger = function (key) {
 			if (_this.results[key] === false) {
 				_this.$el.trigger('validator:error', key);
 			} else {
 				_this.$el.trigger('validator:ok', key);
+			}
+		};
+		var _validate = function (key, validate) {
+			_this.results[key] = validate();
+
+			if (key === 'required') {
+				setTrigger(key);
+			} else if (_this.results.required) {
+				setTrigger(key);
+			}
+		};
+
+		// 必須チェックだけ必ず先に実行する
+		_validate('required', this.validates.required);
+		$.each(this.validates, function (key, validate) {
+			if (key !== 'required') {
+				_validate(key, validate);
 			}
 		});
 		this.$el.trigger('validator:validate');
@@ -164,9 +223,7 @@ Module = function (element, options) {
 	 * _setRequiredValidate
 	 */
 	fn._setRequiredValidate = function () {
-		if (this.required === true) {
-			this.validates.required = $.proxy(this.isRequired, this);
-		}
+		this.validates.required = $.proxy(this.requiredOk, this);
 	};
 
 	/**
@@ -182,12 +239,33 @@ Module = function (element, options) {
 	/**
 	 * isRequired
 	 */
-	fn.isRequired = function () {
-		var result = !!(this.$input.val());
+	fn.isRequired = function ($input) {
+		var attr = $input.attr('data-validator-required');
+		return (attr !== undefined && attr !== 'false') ? true : false;
+	};
 
-		if (this.type === 'radio' || this.type === 'checkbox') {
-			result = !!(this.$input.filter(':checked').val());
-		}
+
+	/**
+	 * requiredOk
+	 * 必須項目が入力済みか調べて返す。
+	 * 必須項目でなければtrueを返す。
+	 */
+	fn.requiredOk = function () {
+		var _this = this;
+		var result = true;
+
+		this.$unit.filter(function () {
+			return _this.isRequired($(this)); // 必須のもののみ
+		}).each(function () {
+			var $this = $(this);
+			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
+
+			if (!$input.val()) {
+				result = false;
+				return false;
+			}
+		});
+
 		return result;
 	};
 
@@ -195,7 +273,19 @@ Module = function (element, options) {
 	 * isAlphabet
 	 */
 	fn.isAlphabet = function () {
-		return /^[a-zA-Z]+$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^[a-zA-Z]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
