@@ -139,6 +139,10 @@ Module = function (element, options) {
 			} else if (_this.results.required) {
 				setTrigger(key);
 			}
+
+			if (!_this.required) {
+				console.log('optional');
+			}
 		});
 		this.$el.trigger('validator:validate');
 	};
@@ -187,9 +191,7 @@ Module = function (element, options) {
 	 * _setRequiredValidate
 	 */
 	fn._setRequiredValidate = function () {
-		if (this.required === true) {
-			this.validates.required = $.proxy(this.isRequired, this);
-		}
+		this.validates.required = $.proxy(this.requiredOk, this);
 	};
 
 	/**
@@ -205,11 +207,24 @@ Module = function (element, options) {
 	/**
 	 * isRequired
 	 */
-	fn.isRequired = function () {
+	fn.isRequired = function ($input) {
+		var attr = $input.attr('data-validator-required');
+		return (attr !== undefined && attr !== 'false') ? true : false;
+	};
+
+
+	/**
+	 * requiredOk
+	 * 必須項目が入力済みか調べて返す。
+	 * 必須項目でなければtrueを返す。
+	 */
+	fn.requiredOk = function () {
 		var _this = this;
 		var result = true;
 
-		this.$unit.each(function () {
+		this.$unit.filter(function () {
+			return _this.isRequired($(this)); // 必須のもののみ
+		}).each(function () {
 			var $this = $(this);
 			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
 
@@ -230,9 +245,11 @@ Module = function (element, options) {
 		var result = true;
 
 		this.$unit.each(function () {
-			if (!/^[a-zA-Z]+$/.test($(this).val())) {
-				result = false;
-				return false;
+			if ($(this).val()) {
+				if (!/^[a-zA-Z]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
 			}
 		});
 
