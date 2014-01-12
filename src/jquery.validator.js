@@ -46,7 +46,7 @@ Module = function (element, options) {
 
 		this.results = {
 			type: true,
-			required: !_this.required,
+			required: _this.requiredOk(),
 			minsize: true
 		};
 
@@ -59,6 +59,10 @@ Module = function (element, options) {
 		if (this.initapply) {
 			this.validate();
 		}
+
+		this.$unit.each(function () {
+			$(this).data('validator-inputed', false)
+		});
 
 		this.$el.trigger('validator:ready');
 	};
@@ -75,26 +79,43 @@ Module = function (element, options) {
 
 		this.$el.on('validator:error', function (event, key) {
 			if (key === 'required') {
-				_this.hideErrorMsg('all');
+
+				var isInputedAll = (function () {
+					return !(_this.$unit.filter('[data-validator-required]').filter(function () {
+						return $(this).data('validator-inputed') === false;
+					}).length);
+				})();
+
+				if (isInputedAll) {
+					_this.hideErrorMsg('all');
+					_this.showErrorMsg(key);
+				}
+			} else {
+				_this.showErrorMsg(key);
 			}
-			_this.showErrorMsg(key);
 		});
 
 		this.$el.on('validator:ok', function (event, key) {
 			_this.hideErrorMsg(key);
 		});
 
+
+		// 一回でも入力されたかどうかのチェック
+		this.$el.on('keyup', '[data-validator-type]', function () {
+			if ($(this).val()) {
+				$(this).data('validator-inputed', true);
+			}
+		});
+
 		// 必須項目でなければ、空白になったらokにする
-		if (!this.required) {
-			this.$el.on(this.event, function () {
-				if (!$(this).find(_this.$input).val()) {
-					$.each(_this.results, function (key, value) {
-						_this.results[key] = true;
-						_this.hideErrorMsg(key);
-					});
-				}
-			});
-		}
+		this.$el.on(this.event, '[data-validator-type]:not([data-validator-required])', function () {
+			if (!_this.isRequired($(this)) && !$(this).val()) {
+				$.each(_this.results, function (key, value) {
+					_this.results[key] = true;
+					_this.hideErrorMsg(key);
+				});
+			}
+		});
 	};
 
 	/**
@@ -131,7 +152,7 @@ Module = function (element, options) {
 				_this.$el.trigger('validator:ok', key);
 			}
 		};
-		$.each(this.validates, function (key, validate) {
+		var _validate = function (key, validate) {
 			_this.results[key] = validate();
 
 			if (key === 'required') {
@@ -139,9 +160,13 @@ Module = function (element, options) {
 			} else if (_this.results.required) {
 				setTrigger(key);
 			}
+		};
 
-			if (!_this.required) {
-				console.log('optional');
+		// 必須チェックだけ必ず先に実行する
+		_validate('required', this.validates.required);
+		$.each(this.validates, function (key, validate) {
+			if (key !== 'required') {
+				_validate(key, validate);
 			}
 		});
 		this.$el.trigger('validator:validate');
