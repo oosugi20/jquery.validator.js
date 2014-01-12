@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
  * lastupdate: 2014-01-13
- * version: 0.1.2
+ * version: 0.1.3
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -93,7 +93,11 @@ Module = function (element, options) {
 					}).length);
 				})();
 
-				if (isInputedAll) {
+				if (isInputedAll || _this.$unit.filter('[data-validator-required]').filter(function () {
+					return $(this).data('validator-inputed') === true;
+				}).filter(function () {
+					return !$(this).val();
+				}).length) {
 					_this.hideErrorMsg('all');
 					_this.showErrorMsg(key);
 				}
@@ -152,20 +156,13 @@ Module = function (element, options) {
 	 */
 	fn.validate = function () {
 		var _this = this;
-		var setTrigger = function (key) {
+		var _validate = function (key, validate) {
+			_this.results[key] = validate();
+
 			if (_this.results[key] === false) {
 				_this.$el.trigger('validator:error', key);
 			} else {
 				_this.$el.trigger('validator:ok', key);
-			}
-		};
-		var _validate = function (key, validate) {
-			_this.results[key] = validate();
-
-			if (key === 'required') {
-				setTrigger(key);
-			} else if (_this.results.required) {
-				setTrigger(key);
 			}
 		};
 
