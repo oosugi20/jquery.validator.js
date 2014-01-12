@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
  * lastupdate: 2014-01-13
- * version: 0.1.3
+ * version: 0.1.4
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -166,13 +166,13 @@ Module = function (element, options) {
 			}
 		};
 
-		// 必須チェックだけ必ず先に実行する
-		_validate('required', this.validates.required);
+		// 必須チェックは必ず最後に実行する
 		$.each(this.validates, function (key, validate) {
 			if (key !== 'required') {
 				_validate(key, validate);
 			}
 		});
+		_validate('required', this.validates.required);
 		this.$el.trigger('validator:validate');
 	};
 
