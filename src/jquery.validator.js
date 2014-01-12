@@ -110,6 +110,9 @@ Module = function (element, options) {
 				$(this).data('validator-inputed', true);
 			}
 		});
+		this.$el.on('change', '[data-validator-type]', function () {
+			$(this).data('validator-inputed', true)
+		});
 
 		// 必須項目でなければ、空白になったらokにする
 		this.$el.on(this.event, '[data-validator-type]:not([data-validator-required])', function () {
