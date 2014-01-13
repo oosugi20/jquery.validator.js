@@ -92,10 +92,6 @@ Module = function (element, options) {
 						return $(this).data('validator-inputed') === false;
 					}).length);
 				})();
-					return $(this).data('validator-inputed') === true;
-				}).filter(function () {
-					return !$(this).val();
-				}).length);
 
 				if (isInputedAll || _this.$unit.filter('[data-validator-required]').filter(function () {
 					return $(this).data('validator-inputed') === true;
