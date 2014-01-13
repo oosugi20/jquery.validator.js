@@ -32,7 +32,6 @@ Module = function (element, options) {
 		var required = this.$el.find('[data-validator-required]').attr('data-validator-required');
 		this.required = (required !== undefined && required !== 'false') ? true : false;
 
-		this.minsize = this.$el.find('[data-validator-minsize]').attr('data-validator-minsize');
 		this.event = this.$el.find('[data-validator-event]').attr('data-validator-event');
 
 		var initapply = this.$el.attr('data-validator-initapply');
@@ -239,7 +238,7 @@ Module = function (element, options) {
 	 * _setMinSizeValidate
 	 */
 	fn._setMinSizeValidate = function () {
-		if (this.minsize) {
+		if (this.$el.find('[data-validator-minsize]').length) {
 			this.validates.minsize = $.proxy(this.testMinSize, this);
 		}
 	};
@@ -301,28 +300,76 @@ Module = function (element, options) {
 	 * hasAlphabet
 	 */
 	fn.hasAlphabet = function () {
-		return /^.*[a-zA-Z].*$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^.*[a-zA-Z].*$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
 	 * hasNumber
 	 */
 	fn.hasNumber = function () {
-		return /^.*[0-9].*$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^.*[0-9].*$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
 	 * isNumber
 	 */
 	fn.isNumber = function () {
-		return /^[0-9]+$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^[0-9]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
 	 * isAlphabetOrNumber
 	 */
 	fn.isAlphabetOrNumber = function () {
-		return /^[a-zA-Z0-9]+$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^[a-zA-Z0-9]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
@@ -336,14 +383,38 @@ Module = function (element, options) {
 	 * isFullWidthChar
 	 */
 	fn.isFullWidthChar = function () {
-		return /^[^ -~｡-ﾟ\t　]+$/.test(this.$input.val());
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/^[^ -~｡-ﾟ\t　]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 	/**
 	 * testMinSize
 	 */
 	fn.testMinSize = function () {
-		return this.minsize <= this.$input.val().length;
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!($(this).attr('data-validator-minsize') <= $(this).val().length)) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
 	};
 
 })(Module.prototype);
