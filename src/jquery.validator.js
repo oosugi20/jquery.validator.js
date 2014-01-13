@@ -56,13 +56,16 @@ Module = function (element, options) {
 
 		this._eventify();
 
-		if (this.initapply) {
-			this.validate();
-		}
-
 		this.$unit.each(function () {
 			$(this).data('validator-inputed', false)
 		});
+
+		if (this.initapply) {
+			this.validate();
+			this.$unit.each(function () {
+				$(this).data('validator-inputed', true)
+			});
+		}
 
 		this.$el.trigger('validator:ready');
 	};
@@ -74,7 +77,11 @@ Module = function (element, options) {
 		var _this = this;
 
 		this.$el.on(this.event, '[data-validator-input]', function () {
-			_this.validate();
+			var isTab = (event.keyCode === 9);
+			if (!isTab) {
+				_this.validate();
+			}
+
 		});
 
 		this.$el.on('validator:error', function (event, key) {
@@ -85,6 +92,10 @@ Module = function (element, options) {
 						return $(this).data('validator-inputed') === false;
 					}).length);
 				})();
+					return $(this).data('validator-inputed') === true;
+				}).filter(function () {
+					return !$(this).val();
+				}).length);
 
 				if (isInputedAll || _this.$unit.filter('[data-validator-required]').filter(function () {
 					return $(this).data('validator-inputed') === true;
@@ -105,13 +116,17 @@ Module = function (element, options) {
 
 
 		// 一回でも入力されたかどうかのチェック
-		this.$el.on('keyup', '[data-validator-type]', function () {
-			if ($(this).val()) {
+		this.$el.on('keyup', '[data-validator-type]', function (event) {
+			var isTab = (event.keyCode === 9);
+			if (!isTab && $(this).val()) {
 				$(this).data('validator-inputed', true);
 			}
 		});
 		this.$el.on('change', '[data-validator-type]', function () {
 			$(this).data('validator-inputed', true)
+		});
+		this.$el.on('blur', '[data-validator-type]', function (event) {
+			$(this).data('validator-inputed', true);
 		});
 
 		// 必須項目でなければ、空白になったらokにする
@@ -156,9 +171,14 @@ Module = function (element, options) {
 			_this.results[key] = validate();
 
 			if (_this.results[key] === false) {
-				_this.$el.trigger('validator:error', key);
+				// blurでdata-validator-inputedの状態を変えるのでその後に実行
+				setTimeout(function () {
+					_this.$el.trigger('validator:error', key);
+				}, 4);
 			} else {
-				_this.$el.trigger('validator:ok', key);
+				setTimeout(function () {
+					_this.$el.trigger('validator:ok', key);
+				}, 4);
 			}
 		};
 
@@ -407,7 +427,7 @@ var Validatorgrp = function (element, options) {
 		var result = true;
 		var _this = this;
 		this.$item.each(function () {
-			var $required = $(this).find('[data-validator-required="true"]');
+			var $required = $(this).find('[data-validator-required]').not('[data-validator-required="false"]');
 			if ($required.length && !$required.val()) {
 				result = false;
 				return false;
