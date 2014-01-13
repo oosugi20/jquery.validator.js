@@ -423,8 +423,11 @@ var Validatorgrp = function (element, options) {
 		var result = true;
 		var _this = this;
 		this.$item.each(function () {
-			var $required = $(this).find('[data-validator-required]').not('[data-validator-required="false"]');
-			if ($required.length && !$required.val()) {
+			var $this = $(this);
+			var $required = $this.find('[data-validator-required]').not('[data-validator-required="false"]');
+			var type = $this.data('validator').type;
+			var val = (type === 'radio' || type === 'checkbox') ? $required.find(':checked').val() : $required.val();
+			if ($required.length && !val) {
 				result = false;
 				return false;
 			}
