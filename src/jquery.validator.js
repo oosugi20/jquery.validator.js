@@ -453,11 +453,12 @@ var Validatorgrp = function (element, options) {
 		this.$item = this.$el.find('[data-validator]');
 		this.$result = this.$el.find('[data-validatorgrp-result]');
 		this.$item.on('validator:validate', function () {
-			_this.testAllInputed();
-		});
-		this.$el.on('validatorgrp:allinputed', function () {
 			_this.test();
+			//_this.testAllInputed();
 		});
+		//this.$el.on('validatorgrp:allinputed', function () {
+		//	_this.test();
+		//});
 		this.$el.on('validatorgrp:ok', function () {
 			_this.$result.filter('[data-validatorgrp-result="error"]').hide();
 			_this.$result.filter('[data-validatorgrp-result="ok"]').show();
@@ -487,30 +488,30 @@ var Validatorgrp = function (element, options) {
 		return result;
 	};
 
-	/**
-	 * fn.testAllInputed
-	 */
-	fn.testAllInputed = function () {
-		var result = true;
-		var _this = this;
-		this.$item.each(function () {
-			var $this = $(this);
-			var $required = $this.find('[data-validator-required]').not('[data-validator-required="false"]');
-			var type = $this.data('validator').type;
-			var val = (type === 'radio' || type === 'checkbox') ? $required.find(':checked').val() : $required.val();
-			if ($required.length && !val) {
-				result = false;
-				return false;
-			}
-		});
-		if (result) {
-			// validatorのevent後に発火させる
-			setTimeout(function () {
-				_this.$el.trigger('validatorgrp:allinputed');
-			}, 4);
-		}
-		return result;
-	};
+	///**
+	// * fn.testAllInputed
+	// */
+	//fn.testAllInputed = function () {
+	//	var result = true;
+	//	var _this = this;
+	//	this.$item.each(function () {
+	//		var $this = $(this);
+	//		var $required = $this.find('[data-validator-required]').not('[data-validator-required="false"]');
+	//		var type = $this.data('validator').type;
+	//		var val = (type === 'radio' || type === 'checkbox') ? $required.find(':checked').val() : $required.val();
+	//		if ($required.length && !val) {
+	//			result = false;
+	//			return false;
+	//		}
+	//	});
+	//	if (result) {
+	//		// validatorのevent後に発火させる
+	//		setTimeout(function () {
+	//			_this.$el.trigger('validatorgrp:allinputed');
+	//		}, 4);
+	//	}
+	//	return result;
+	//};
 })(Validatorgrp.prototype);
 
 $.fn.validatorgrp = function (options) {
