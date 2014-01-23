@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
- * lastupdate: 2014-01-13
- * version: 0.1.9
+ * lastupdate: 2014-01-23
+ * version: 0.1.10
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -231,6 +231,9 @@ Module = function (element, options) {
 				break;
 			case 'select':
 				break;
+			case 'email':
+				this.validates.type = $.proxy(this.isEmail, this);
+				break;
 		}
 	};
 
@@ -396,6 +399,26 @@ Module = function (element, options) {
 		this.$unit.each(function () {
 			if ($(this).val()) {
 				if (!/^[^ -~｡-ﾟ\t　]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
+	};
+
+	/**
+	 * isEmail
+	 * @ が付いた文字列になっているかどうか
+	 */
+	fn.isEmail = function () {
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/.+@.+$/.test($(this).val())) {
 					result = false;
 					return false;
 				}
