@@ -224,6 +224,9 @@ Module = function (element, options) {
 				break;
 			case 'select':
 				break;
+			case 'email':
+				this.validates.type = $.proxy(this.isEmail, this);
+				break;
 		}
 	};
 
@@ -389,6 +392,26 @@ Module = function (element, options) {
 		this.$unit.each(function () {
 			if ($(this).val()) {
 				if (!/^[^ -~｡-ﾟ\t　]+$/.test($(this).val())) {
+					result = false;
+					return false;
+				}
+			}
+		});
+
+		return result;
+	};
+
+	/**
+	 * isEmail
+	 * @ が付いた文字列になっているかどうか
+	 */
+	fn.isEmail = function () {
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			if ($(this).val()) {
+				if (!/.+@.+$/.test($(this).val())) {
 					result = false;
 					return false;
 				}
