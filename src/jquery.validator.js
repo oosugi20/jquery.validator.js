@@ -302,7 +302,7 @@ Module = function (element, options) {
 		this.$unit.each(function () {
 			var $this = $(this);
 			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
-			var $target = $('[data-validator-id="' + $this.attr('data-validator-reinputtarget') + '"');
+			var $target = $('[data-validator-id="' + $this.attr('data-validator-reinputtarget') + '"]');
 
 			if (!_this.isSame($input, $target)) {
 				result = false;
