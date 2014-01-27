@@ -185,6 +185,33 @@ required <input
 
 
 <pre>
+ data-validator-type="reinput"
+</pre>
+
+<input type="text" value="" data-validator="hoge">
+
+<div data-validator="unique-id">
+required <input
+ type="text"
+ value=""
+ data-validator-input
+ data-validator-type="reinput"
+ data-validator-reinputtarget="hoge"
+ data-validator-required="true"
+ data-validator-event="keyup"
+/> 
+ 
+<div data-validator-errormsg="required">Error: requierd</div>
+<div data-validator-errormsg="type">Error: type</div>
+<div data-validator-errormsg="minsize">Error: minsize</div>
+</div>
+
+
+
+<hr />
+
+
+<pre>
  data-validator-type="select"
 </pre>
 <div data-validator="unique-id">
