@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
- * lastupdate: 2014-01-27
- * version: 0.1.11
+ * lastupdate: 2014-01-28
+ * version: 0.1.12
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -234,6 +234,9 @@ Module = function (element, options) {
 			case 'email':
 				this.validates.type = $.proxy(this.isEmail, this);
 				break;
+			case 'reinput':
+				this.validates.type = $.proxy(this.reinputOk, this);
+				break;
 		}
 	};
 
@@ -264,6 +267,15 @@ Module = function (element, options) {
 
 
 	/**
+	 * isSame
+	 */
+	fn.isSame = function ($input, $target) {
+		console.log($input.val(), $target.val());
+		return $input.val() === $target.val();
+	};
+
+
+	/**
 	 * requiredOk
 	 * 必須項目が入力済みか調べて返す。
 	 * 必須項目でなければtrueを返す。
@@ -279,6 +291,28 @@ Module = function (element, options) {
 			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
 
 			if (!$input.val()) {
+				result = false;
+				return false;
+			}
+		});
+
+		return result;
+	};
+
+
+	/**
+	 * reinputOk
+	 */
+	fn.reinputOk = function () {
+		var _this = this;
+		var result = true;
+
+		this.$unit.each(function () {
+			var $this = $(this);
+			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
+			var $target = $('[data-validator="' + $this.attr('data-validator-reinputtarget') + '"');
+
+			if (!_this.isSame($input, $target)) {
 				result = false;
 				return false;
 			}
