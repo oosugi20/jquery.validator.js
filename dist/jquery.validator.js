@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
  * lastupdate: 2014-01-28
- * version: 0.1.12
+ * version: 0.1.13
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -270,7 +270,6 @@ Module = function (element, options) {
 	 * isSame
 	 */
 	fn.isSame = function ($input, $target) {
-		console.log($input.val(), $target.val());
 		return $input.val() === $target.val();
 	};
 
@@ -310,7 +309,7 @@ Module = function (element, options) {
 		this.$unit.each(function () {
 			var $this = $(this);
 			var $input = (_this.type === 'radio' || _this.type === 'checkbox') ? $this.find(_this.$input.filter(':checked')) : $this;
-			var $target = $('[data-validator="' + $this.attr('data-validator-reinputtarget') + '"');
+			var $target = $('[data-validator-id="' + $this.attr('data-validator-reinputtarget') + '"');
 
 			if (!_this.isSame($input, $target)) {
 				result = false;
