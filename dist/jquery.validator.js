@@ -1,7 +1,7 @@
 /*! jquery.validator.js (git@github.com:oosugi20/jquery.validator.js.git)
 * 
- * lastupdate: 2014-01-23
- * version: 0.1.10
+ * lastupdate: 2014-01-27
+ * version: 0.1.11
  * author: Makoto OOSUGI <oosugi20@gmail.com>
  * License: MIT
  */
@@ -82,7 +82,7 @@ Module = function (element, options) {
 	fn._eventify = function () {
 		var _this = this;
 
-		this.$el.on(this.event, '[data-validator-input]', function () {
+		this.$el.on(this.event, '[data-validator-input]', function (event) {
 			var isTab = (event.keyCode === 9);
 			if (!isTab) {
 				_this.validate();
